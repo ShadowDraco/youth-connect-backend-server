@@ -8,7 +8,7 @@ const axios = require("axios");
 const SECRET = process.env.SECRET || "secretstring";
 
 const userModel = (sequelize, DataTypes) => {
-  const model = sequelize.define("Users", {
+  const model = sequelize.define("ConnectUsers", {
     username: { type: DataTypes.STRING, required: true, unique: true },
     password: { type: DataTypes.STRING, required: true },
     role: {
@@ -52,8 +52,8 @@ const userModel = (sequelize, DataTypes) => {
   });
 
   model.authenticateBasic = async function (username, password) {
-    console.log(username, password);
     const user = await this.findOne({ where: { username } });
+    console.log('found', user.username)
     const valid = await bcrypt.compare(password, user.password);
     if (valid) {
       console.log("VALID USER");
