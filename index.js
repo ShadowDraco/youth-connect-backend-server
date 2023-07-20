@@ -13,25 +13,16 @@ const server = http.createServer(app);
 //? create socket server HUB
 const { Server } = require("socket.io");
 const io = new Server(server);
-const axios = require("axios");
 const { db } = require("./server/models/index.js");
 
 const {
-  relayMessage,
   message,
-  authenticate,
-  verifyRoom,
-  createRoom,
-  createUser,
-  getUsers,
   getRoomOptions,
   deleteRoom,
   updateRoom,
   getRoomUsers,
   deleteUserInRoom,
 } = require("./socketHandlers/handlerIndex.js");
-
-const { Statement } = require("sqlite3");
 
 // TODO When the server starts create the rooms from the database
 
@@ -53,37 +44,6 @@ io.on("connection", (socket) => {
   socket.on("I AM HERE", (username) => {
     socket.to("admins").emit("IM HERE ADMINS", username);
   });
-  /* //?------------------------------ HANDLE USERS ------------------------------ */
-  // TODO Create a user
-  socket.on("CREATE USER", (payload) => {
-    //TODO - create a user in the database
-    let userInfo = createUser(payload, socket);
-    socket.emit("UPDATE YOUR USER", userInfo);
-  });
-
-  socket.on("GET ALL USERS", (payload) => {
-    let userInfo = getUsers(payload, socket);
-    socket.emit("ALL USERS", userInfo);
-  });
-
-  /* //?------------------------------ HANDLE ROOMS ------------------------------ */
-
-  socket.on("CREATE ROOM", async (payload) => {
-    //TODO - create a room in the database
-    createRoom(payload, socket);
-    //TODO - update the room options
-    let roomList = await getRoomOptions();
-    //TODO - send the updated room options to the client
-
-    socket.emit("UPDATED ROOMS", roomList.data);
-  });
-
-  socket.on("GIVE ME UPDATED ROOMS", async (payload) => {
-    let roomList = await getRoomOptions();
-    socket.emit("UPDATED ROOMS", roomList.data);
-  });
-
-  // TODO handle join room event
 
   socket.on("join", async (payload) => {
     let roomList = await getRoomOptions();
@@ -94,6 +54,7 @@ io.on("connection", (socket) => {
 
     let today = new Date();
     let age = today.getFullYear() - parseInt(payload.user.DOB.split("/"));
+    console.log("AGE:", age);
 
     if (payload.room === "admins") {
       socket.join(payload.room);
@@ -110,7 +71,7 @@ io.on("connection", (socket) => {
         console.log(`${socket.id} joined the ${payload.room} room.`);
       } else {
         console.log("you cant enter");
-        socket.emit("GO TO MENU", {});
+        socket.emit("ACCESS DENIED");
       }
     }
   });
@@ -158,39 +119,11 @@ io.on("connection", (socket) => {
     socket.emit("UPDATE USER NAME", payload);
   });
 
-  //TODO - handle leave room event
-  socket.on("LEAVE ROOM", (payload) => {
-    //TODO - update the users in the room
-    let getUsersInRoom = getRoomUsers(payload, socket);
-    let updatedUsers = deleteUserInRoom(getUsersInRoom, payload.user);
-    let newPayload = { room: payload.room, users: updatedUsers };
-    //TODO - update the room options
-    updateRoom(newPayload, socket);
-
-    //TODO - send the updated room options to the client
-    socket.emit("LEFT ROOM ", payload.user);
-  });
-
   /* //?----------------------------- HANDLE MESSAGES ---------------------------- */
 
   socket.on("MESSAGE", async (payload) => {
     // use the 'middleware'
     await message(payload, socket, recentMessages);
-
-    // when server receives a message, make the client start their prompt so it continues the cycle
-    socket.emit("GO BACK TO ROOM", {});
-  });
-
-  // handle giving the recent messages to the client
-  socket.on("GET RECENT MESSAGES", (payload) => {
-    let messagePayload;
-    if (!recentMessages[`${payload}RecentMessages`]) {
-      messagePayload = [];
-    } else {
-      messagePayload = recentMessages[`${payload}RecentMessages`];
-    }
-
-    socket.emit("SENDING RECENT MESSAGES", messagePayload); //Room1RecentMessages
   });
 
   /* //?------------------------------- USER LOGIN ------------------------------- */
