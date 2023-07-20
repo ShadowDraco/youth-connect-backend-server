@@ -46,35 +46,36 @@ io.on("connection", (socket) => {
   });
 
   socket.on("join", async (payload) => {
-    let roomList = await getRoomOptions();
-    let rooms = roomList.data;
-    // this returns and array, not an object
-    let room = rooms.filter((room) => room.name === payload.room);
-    let currentRoom = room[0];
+    // let roomList = await getRoomOptions();
+    // let rooms = roomList.data;
+    // // this returns and array, not an object
+    // let room = rooms.filter((room) => room.name === payload.room);
+    // let currentRoom = room[0];
 
-    let today = new Date();
-    let age = today.getFullYear() - parseInt(payload.user.DOB.split("/"));
-    console.log("AGE:", age);
+    // let today = new Date();
+    // let age = today.getFullYear() - parseInt(payload.user.DOB.split("/"));
+    // console.log("AGE:", age);
 
-    if (payload.room === "admins") {
-      socket.join(payload.room);
-    } else {
-      // check if they have permission join
+    // if (payload.room === "admins") {
+       socket.join(payload.room);
+    // }
+      //  else {
+      //   // check if they have permission join
 
-      if (
-        (age > currentRoom.minimumAge && age < currentRoom.maxAge) ||
-        payload.user.username === "admin"
-      ) {
-        console.log("You can enter this room");
-        socket.emit("UPDATE CURRENT ROOM", payload.room);
-        socket.join(payload.room);
-        console.log(`${socket.id} joined the ${payload.room} room.`);
-      } else {
-        console.log("you cant enter");
-        socket.emit("ACCESS DENIED");
-      }
-    }
-  });
+    //   if (
+    //     (age > currentRoom.minimumAge && age < currentRoom.maxAge) ||
+    //     payload.user.username === "admin"
+    //   ) {
+    //     console.log("You can enter this room");
+    //     socket.emit("UPDATE CURRENT ROOM", payload.room);
+    //     socket.join(payload.room);
+    //     console.log(`${socket.id} joined the ${payload.room} room.`);
+    //   } else {
+    //     console.log("you cant enter");
+    //     socket.emit("ACCESS DENIED");
+    //   }
+});
+
 
   // when user leaves a room leave it
   socket.on("leave", (payload) => {
