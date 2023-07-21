@@ -10,13 +10,33 @@ const filter2 = require("leo-profanity");
 const message = async (payload, socket) => {
   if (payload.text !== "") {
     try {
-      // Filter
+      const currentRoomMessages = `${payload.room}RecentMessages`;
+      //if the message (room specific) queue doesn't exist create it
+      if (!recentMessages[currentRoomMessages]) {
+        recentMessages[currentRoomMessages] = [];
+      }
+
       let cleanWords1 = filter1.clean(payload.text);
       let cleanWords2 = filter2.clean(cleanWords1);
 
       //* Then send it to the other clients */
 
-      socket.to(payload.room).emit("NEW MESSAGE",    {
+      // push the message just submitted
+      recentMessages[currentRoomMessages].push({
+        room: payload.room,
+        text: cleanWords2,
+        username: payload.username,
+      });
+
+      // create and manage a list of most recent messages //? so they can be displayed in the terminal
+
+      if (recentMessages[currentRoomMessages].length > 30) {
+        // remove last message, do nothing with it
+        let lastMessage = recentMessages[currentRoomMessages].shift();
+        console.log("removed message from last 10:", lastMessage);
+      }
+
+      socket.to(payload.room).emit("NEW MESSAGE", {
         text: cleanWords2,
         room: payload.room,
         username: payload.username,
@@ -34,7 +54,7 @@ const message = async (payload, socket) => {
 
       console.log("This is the created message:", createdMessage.data.text);
     } catch (error) {
-      console.log("Error creating collection object:", error.message);
+      console.log("Error creating collection object:", error);
     }
   }
 };

@@ -15,6 +15,9 @@ const { db } = require("./server/models/index.js");
 
 const { message } = require("./socketHandlers/handlerIndex.js");
 
+//create a feed of only the most recent messages from the database in real time
+let recentMessages = {};
+
 //pass in the socket(that connected/made a request) to each of these functions
 io.on("connection", (socket) => {
   socket.onAny((event, payload) => {
@@ -43,7 +46,19 @@ io.on("connection", (socket) => {
 
   socket.on("MESSAGE", async (payload) => {
     // use the 'middleware'
-    await message(payload, socket);
+    await message(payload, socket, recentMessages);
+  });
+
+  // handle giving the recent messages to the client
+  socket.on("GET RECENT MESSAGES", (payload) => {
+    let messagePayload;
+    if (!recentMessages[`${payload}RecentMessages`]) {
+      messagePayload = [];
+    } else {
+      messagePayload = recentMessages[`${payload}RecentMessages`];
+    }
+
+    socket.emit("SENDING RECENT MESSAGES", messagePayload); //Room1RecentMessages
   });
 
   /* //?------------------------------- USER LOGIN ------------------------------- */
