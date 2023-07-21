@@ -50,6 +50,7 @@ async function handleCreate(req, res) {
   try {
     let obj = req.body;
     let newRecord = await req.model.create(obj);
+    console.log("NEW RECORD", newRecord);
     res.status(201).json(newRecord);
   } catch (error) {
     console.log(error);
