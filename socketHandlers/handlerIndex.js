@@ -2,6 +2,7 @@
 
 const axios = require("axios");
 
+import { v4 as uuidv4 } from "uuid";
 const Filter = require("bad-words");
 const filter1 = new Filter();
 const filter2 = require("leo-profanity");
@@ -36,20 +37,19 @@ const message = async (payload, socket, recentMessages) => {
         console.log("removed message from last 30:", lastMessage);
       }
 
-      socket.to(payload.room).emit("NEW MESSAGE", {
+      const newMessage = {
+        id: uuidv4(),
         text: cleanWords2,
         room: payload.room,
         username: payload.username,
-      });
+      };
+
+      socket.to(payload.room).emit("NEW MESSAGE", message);
 
       //* Then send it to database */
       let createdMessage = await axios.post(
         `http://localhost:3001/api/v1/messages`,
-        {
-          text: cleanWords2,
-          room: payload.room,
-          username: payload.username,
-        }
+        newMessage
       );
 
       console.log("This is the created message:", createdMessage.data.text);

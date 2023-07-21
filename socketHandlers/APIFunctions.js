@@ -61,10 +61,37 @@ const getRooms = async () => {
   // ...
 };
 
-const deleteRoom = async (payload) => {
+const deleteRoom = async (id) => {
   const method = "DELETE";
   const url = `https://youth-connect-server.onrender.com/api/v1/rooms/${id}`;
   const action = "DELETING ROOM";
+  let headers = new Headers();
+  const body = {};
+  // Basic auth only
+  // let user = base64.encode(`${username}:${password}`);
+  // Bearer auth only
+  headers.set("Authorization", `Bearer ${user.token}`);
+  try {
+    fetch(url, {
+      method: method,
+      headers: headers,
+      body: body,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        //-----
+      })
+      .catch((err) => console.error(err));
+  } catch (error) {
+    console.log("ERROR ", action, ":", error);
+  }
+  // ...
+};
+
+const deleteMessage = async (id) => {
+  const method = "DELETE";
+  const url = `https://youth-connect-server.onrender.com/api/v1/messages/${id}`;
+  const action = "DELETING MESSAGE";
   let headers = new Headers();
   const body = {};
   // Basic auth only
@@ -121,7 +148,7 @@ const updateRoom = async (payload) => {
   // ...
 };
 
-const createUser = async (payload) => {
+const createUser = async (id) => {
   const method = "POST";
   const url = "https://youth-connect-server.onrender.com/api/v1/users";
   const action = "CREATING USER";
@@ -152,7 +179,7 @@ const createUser = async (payload) => {
   // ...
 };
 
-const getUsers = async (payload) => {
+const getUsers = async () => {
   const method = "GET";
   const url = "https://youth-connect-server.onrender.com/api/v1/users";
   const action = "GETTING USERS";
