@@ -16,7 +16,11 @@ const message = async (payload, socket) => {
 
       //* Then send it to the other clients */
 
-      socket.to(payload.room).emit("NEW MESSAGE", cleanWords2);
+      socket.to(payload.room).emit("NEW MESSAGE",    {
+        text: cleanWords2,
+        room: payload.room,
+        username: payload.username,
+      });
 
       //* Then send it to database */
       let createdMessage = await axios.post(
