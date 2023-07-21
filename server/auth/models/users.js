@@ -3,8 +3,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const axios = require("axios");
-
 const SECRET = process.env.SECRET || "secretstring";
 
 const userModel = (sequelize, DataTypes) => {
@@ -53,7 +51,6 @@ const userModel = (sequelize, DataTypes) => {
 
   model.authenticateBasic = async function (username, password) {
     const user = await this.findOne({ where: { username } });
-    console.log('found', user.username)
     const valid = await bcrypt.compare(password, user.password);
     if (valid) {
       console.log("VALID USER");

@@ -41,6 +41,22 @@ authRouter.get(
   }
 );
 
+authRouter.put(
+  "/users/:id/approve",
+  bearerAuth,
+  permissions("delete"),
+  async (req, res, next) => {
+    const id = req.params.id;
+    try {
+      const userRecord = await userModule.findOneAndUpdate({ where: { id } });
+
+      userRecord.update({ approved: true });
+    } catch (err) {
+      console.log("ERROR APPROVING USER: ", err);
+    }
+  }
+);
+
 authRouter.get("/secret", bearerAuth, async (req, res, next) => {
   res.status(200).send("Welcome to the secret area");
 });
