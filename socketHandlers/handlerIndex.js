@@ -7,7 +7,7 @@ const filter1 = new Filter();
 const filter2 = require("leo-profanity");
 
 // HANDLE MESSAGES ON THE SERVER SIDE
-const message = async (payload, socket) => {
+const message = async (payload, socket, recentMessages) => {
   if (payload.text !== "") {
     try {
       const currentRoomMessages = `${payload.room}RecentMessages`;
@@ -33,7 +33,7 @@ const message = async (payload, socket) => {
       if (recentMessages[currentRoomMessages].length > 30) {
         // remove last message, do nothing with it
         let lastMessage = recentMessages[currentRoomMessages].shift();
-        console.log("removed message from last 10:", lastMessage);
+        console.log("removed message from last 30:", lastMessage);
       }
 
       socket.to(payload.room).emit("NEW MESSAGE", {
