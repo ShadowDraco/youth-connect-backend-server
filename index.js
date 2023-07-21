@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
 
   socket.on("MESSAGE", async (payload) => {
     // use the 'middleware'
-    await message(payload, socket, recentMessages);
+    await message(payload, socket);
   });
 
   /* //?------------------------------- USER LOGIN ------------------------------- */
