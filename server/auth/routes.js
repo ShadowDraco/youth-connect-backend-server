@@ -15,6 +15,7 @@ authRouter.post("/signup", async (req, res, next) => {
       user: userRecord,
       token: userRecord.token,
     };
+    console.log("Sign up success", user);
     res.status(201).json(output);
   } catch (e) {
     next(e.message);
@@ -27,7 +28,7 @@ authRouter.post("/signin", basicAuth, (req, res, next) => {
       user: req.user,
       token: req.user.token,
     };
-    console.log("Sign up success", user);
+
     res.status(200).json(user);
   } catch (error) {
     next(error.message);
