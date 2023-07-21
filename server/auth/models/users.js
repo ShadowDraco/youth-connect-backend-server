@@ -45,9 +45,13 @@ const userModel = (sequelize, DataTypes) => {
   });
 
   model.beforeCreate(async (user) => {
-    console.log("hashing password", user);
-    let hashedPass = await bcrypt.hash(user.password, 10);
-    user.password = hashedPass;
+    console.log("hashing password");
+    try {
+      let hashedPass = await bcrypt.hash(user.password, 10);
+      user.password = hashedPass;
+    } catch (error) {
+      console.log("error hashing password", user, error);
+    }
   });
 
   model.authenticateBasic = async function (username, password) {
