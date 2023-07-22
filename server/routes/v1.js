@@ -14,6 +14,7 @@ router.param("model", (req, res, next) => {
 
   if (dataModules[modelName]) {
     req.model = dataModules[modelName];
+    console.log('found model', req.model)
     next();
   } else {
     next("Invalid Model");
@@ -49,6 +50,7 @@ async function handleGetOne(req, res) {
 async function handleCreate(req, res) {
   try {
     let obj = req.body;
+    console.log('creating something', obj, req.model)
     let newRecord = await req.model.create(obj);
     console.log("NEW RECORD", newRecord);
     res.status(201).json(newRecord);
