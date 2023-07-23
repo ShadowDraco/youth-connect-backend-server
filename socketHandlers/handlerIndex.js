@@ -20,14 +20,17 @@ const message = async (payload, socket, recentMessages) => {
       let cleanWords1 = filter1.clean(payload.text);
       let cleanWords2 = filter2.clean(cleanWords1);
 
+      const newMessage = {
+        id: uuidv4(),
+        text: cleanWords2,
+        room: payload.room,
+        username: payload.username,
+      };
+
       //* Then send it to the other clients */
 
       // push the message just submitted
-      recentMessages[currentRoomMessages].push({
-        room: payload.room,
-        text: cleanWords2,
-        username: payload.username,
-      });
+      recentMessages[currentRoomMessages].push(newMessage);
 
       // create and manage a list of most recent messages //? so they can be displayed in the terminal
 
@@ -36,13 +39,6 @@ const message = async (payload, socket, recentMessages) => {
         let lastMessage = recentMessages[currentRoomMessages].shift();
         console.log("removed message from last 30:", lastMessage);
       }
-
-      const newMessage = {
-        id: uuidv4(),
-        text: cleanWords2,
-        room: payload.room,
-        username: payload.username,
-      };
 
       socket.to(payload.room).emit("NEW MESSAGE", message);
 
@@ -75,7 +71,7 @@ const getRoomOptions = async () => {
   return roomList;
 };
 
-const deleteRoom = async (payload, socket) => {
+const deleteRoom = async (payload) => {
   let deletedRoom = await axios.delete(
     `http://localhost:3001/api/v2/rooms/${payload.room}`
   );
